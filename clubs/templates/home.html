@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Welcome to <span class="text-primary">student club</span></h1>
+        <p class="lead text-muted">Join and manage college clubs, participate in decisions, and connect with like-minded students</p>
+    </div>
+
+    <div id="clubs-container" class="row">
+        {% if clubs %}
+            {% for club in clubs %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        {% if club.logo %}
+                            <img src="{{ club.logo.url }}" class="card-img-top" alt="{{ club.name }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ club.name }}</h5>
+                            <p class="card-text text-muted">{{ club.description|truncatewords:30 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ club.member_set.count }} members</small>
+                                <a href="{% url 'club_detail' club.id %}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No clubs available yet. Be the first to create one!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

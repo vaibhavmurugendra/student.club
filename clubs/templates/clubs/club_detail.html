@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ club.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>{{ club.name }}</h1>
+            {% if user_is_admin %}
+                <a href="{% url 'edit_club' club.id %}" class="btn btn-outline-primary">Edit Club</a>
+            {% endif %}
+        </div>
+        {% if club.logo %}
+            <img src="{{ club.logo.url }}" alt="{{ club.name }}" class="img-fluid mb-3" style="max-height: 200px;">
+        {% endif %}
+        <p class="lead">{{ club.description }}</p>
+        <p class="text-muted">Created by {{ club.creator.username }} on {{ club.created_at|date:"F d, Y" }}</p>
+
+        {% if not is_member %}
+            <form action="{% url 'join_club' club.id %}" method="post" class="mb-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Join Club</button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Proposals</h5>
+            </div>
+            <div class="card-body">
+                {% if club.proposals.all %}
+                    <p>{{ club.proposals.count }} proposal(s) available</p>
+                {% else %}
+                    <p class="text-muted">No proposals yet.</p>
+                {% endif %}
+                {% if is_member %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'proposal_list' club.id %}" class="btn btn-outline-primary btn-sm">View All Proposals</a>
+                        <a href="{% url 'create_proposal' club.id %}" class="btn btn-primary btn-sm">New Proposal</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Members</h5>
+            </div>
+            <div class="card-body">
+                {% if user_is_admin %}
+                    <div class="mb-3">
+                        <a href="{% url 'manage_roles' club.id %}" class="btn btn-outline-primary btn-sm">Manage Roles</a>
+                    </div>
+                {% endif %}
+                <ul class="list-unstyled">
+                    {% for member in club.member_set.all %}
+                        <li class="mb-2">
+                            {{ member.user.username }}
+                            <span class="badge {% if member.role == 'ADMIN' %}bg-danger
+                                           {% elif member.role == 'PRESIDENT' %}bg-primary
+                                           {% elif member.role == 'VICE_PRESIDENT' %}bg-success
+                                           {% elif member.role == 'SECRETARY' %}bg-info
+                                           {% else %}bg-secondary{% endif %}">
+                                {{ member.get_role_display }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

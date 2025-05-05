@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Clubs{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>All Clubs</h2>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="col-md-4 text-end">
+        <a href="{% url 'create_club' %}" class="btn btn-primary">Create New Club</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Search Form -->
+<div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+        <div class="input-group">
+            <input type="text" id="club-search" class="form-control" placeholder="Search clubs..." value="{{ search_query }}">
+            <div class="input-group-append">
+                <button id="search-button" class="btn btn-primary" type="button">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </div>
+        <div id="search-feedback" class="mt-2 text-muted small"></div>
+    </div>
+</div>
+
+<div id="clubs-container" class="row">
+    {% if clubs %}
+        {% for club in clubs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if club.logo %}
+                        <img src="{{ club.logo.url }}" class="card-img-top" alt="{{ club.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ club.name }}</h5>
+                        <p class="card-text">{{ club.description|truncatewords:30 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'club_detail' club.id %}" class="btn btn-primary">View Details</a>
+                            <small class="text-muted">Created {{ club.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <p class="text-center">No clubs available yet. {% if user.is_authenticated %}Why not create one?{% endif %}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/club_search.js' %}"></script>
+{% endblock %}
